@@ -1,11 +1,7 @@
 # el5206_ws
-Workspace for EL5206 - FCFM
+Workspace for EL5206 project
 
-# Instrucciones
+Original el5206_ws develop by Felipe Vergara and Ignacio Dassori
 
-Este es el workspace que se utilizará para el semestre Primavera de EL5206. Para la instalación, clonen este repositorio en su directorio HOME, entren a la carpeta y luego deben hacer `source` al `install.bash`.
+Stalker 3000 - el5206 project changes made by Diego Castillo and Pablo Cornejo
 
-    cd ~
-    git clone https://github.com/felipe-vergaram/el5206_ws.git
-    cd el5206_ws
-    source install.bash
