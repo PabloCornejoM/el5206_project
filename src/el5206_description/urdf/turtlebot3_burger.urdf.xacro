@@ -2,7 +2,7 @@
 <robot name="turtlebot3_burger" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find el5206_description)/urdf/common_properties.xacro"/>
   <xacro:include filename="$(find el5206_description)/urdf/turtlebot3_burger.gazebo.xacro"/>
-
+  <xacro:property name="camera_link" value="0.05" /> <!-- Size of square 'camera' box -->
   <link name="base_footprint"/>
 
   <joint name="base_joint" type="fixed">
@@ -161,5 +161,34 @@
                izz="0.001" />
     </inertial>
   </link>
+
+  <joint name="camera_rgb_joint" type="fixed">
+    <origin xyz="0.003 0.011 0.1" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="depth_camera"/>
+  </joint>
+
+  <link name="depth_camera">
+    <inertial><mass value="0.1" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+               iyy="0.001" iyz="0.0"
+               izz="0.001" /></inertial>
+    <collision name="collision">
+      <geometry>
+        <box size="0.073000 0.276000 0.072000" />
+      </geometry>
+    </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh filename="model://kinect/meshes/kinect.dae" />
+        </geometry>
+      </visual>
+  </link>
+  <joint name="camera_rgb_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+    <parent link="depth_camera"/>
+    <child link="camera_rgb_optical_frame"/>
+  </joint>
+  <link name="camera_rgb_optical_frame"/>
 
 </robot>
