@@ -8,9 +8,8 @@ program.
 Authors: Your dear 2022.Spring.teaching_staff
 (Eduardo Jorquera, Ignacio Dassori & Felipe Vergara)
 """
-
-#test xdxdxdxdxdx
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import math
 import numpy as np
 import rospkg
@@ -20,10 +19,13 @@ import tf
 import tf2_ros
 import time
 import yaml
+import cv2
+from cv_bridge import CvBridge, CvBridgeError
 
 from geometry_msgs.msg import Twist, Pose2D
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
+from sensor_msgs.msg import Image
 
 class EL5206_Robot:
     def __init__(self):
@@ -47,15 +49,21 @@ class EL5206_Robot:
         self.target_y   = None
         self.target_yaw = None
         self.path = rospkg.RosPack().get_path('el5206_example')
+        
+        self.image = None
+        self.bridge = CvBridge()
+        
 
         # Extra variable to print odometry
         self.odom_i = 0
+        self.kinect_i = 0
 
         # Subscribers
         rospy.Subscriber("/odom",               Odometry,  self.odometryCallback)
         rospy.Subscriber("/ground_truth/state", Odometry,  self.groundTruthCallback)
         rospy.Subscriber("/scan",               LaserScan, self.scanCallback)
         rospy.Subscriber("/target_pose",        Pose2D,    self.poseCallback)
+        rospy.Subscriber("/camera_ir/camera/color/image_raw",Image,self.kinectCallback)
 
         # Publishers
         self.vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
@@ -74,6 +82,18 @@ class EL5206_Robot:
     can be threaded, they may change some of the variables you are using in the 
     main code.
     """
+    
+    def kinectCallback(self,msg):
+    	try:
+    		cv_image = self.bridge.imgmsg_to_cv2(msg,"bgr8")
+    	except CvBridgeError as e:
+    		print(e)
+    		
+    	#print(cv_image)
+    	#plt.hist(cv_image.ravel(),256,[0,256]); plt.show()
+    	#cv2.imshow("Image window", cv_image)
+    	cv2.waitKey(3)
+    
     def scanCallback(self, msg):
         """
         Receives a LaserScan message and saves it self.currentScan.
@@ -87,12 +107,12 @@ class EL5206_Robot:
         to get the (x,y,yaw) coordinates and save the in the self.odom_x, 
         self.odom_y and self.odom_yaw attributes.
         """
-        self.odom_i += 1
-        if self.odom_i%30==0:
+        #self.odom_i += 1
+        #if self.odom_i%30==0:
             # Print one every 30 msgs
-            print("This is the Odometry message:")
-            print(msg)
-        self.odom_x, self.odom_y, self.odom_yaw = self.odom2Coords(msg)
+            #print("This is the Odometry message:")
+            #print(msg)
+        #self.odom_x, self.odom_y, self.odom_yaw = self.odom2Coords(msg)
     
 
     def groundTruthCallback(self, msg):
@@ -295,7 +315,8 @@ if __name__ == '__main__':
 
     try:
         # Demo function
-        node.dance()
+        #node.dance()
+        
 
     except rospy.ROSInterruptException:
         rospy.logerr("ROS Interrupt Exception! Just ignore the exception!")
